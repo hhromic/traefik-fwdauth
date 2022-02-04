@@ -45,6 +45,9 @@ class OIDCService:
 
     async def introspection(self, token, *, token_type_hint=None):
         """Perform a token introspection request."""
+        if self.introspection_endpoint is None:
+            raise RuntimeError("introspection endpoint not set, call discover() first")
+
         LOGGER.debug("Performing introspection: introspection_endpoint=%s, token_type_hint=%s",
                      self.introspection_endpoint, token_type_hint)
 

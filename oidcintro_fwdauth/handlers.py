@@ -14,6 +14,8 @@ async def auth_handler(request):
     client_ids = (set(request.query.get("client_ids").split(","))
                   if request.query.get("client_ids") else None)
 
+    token_type_hint = request.query.get("token_type_hint", None)
+
     for authorization in authorization_headers:
         if " " not in authorization:
             continue
@@ -21,7 +23,7 @@ async def auth_handler(request):
         if scheme.lower() != "bearer":
             continue
 
-        token_info = await oidc_service.introspection(parameters)
+        token_info = await oidc_service.introspection(parameters, token_type_hint=token_type_hint)
         if "active" in token_info and not token_info["active"]:
             continue
 

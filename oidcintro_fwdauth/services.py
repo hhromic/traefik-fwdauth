@@ -14,17 +14,15 @@ class OIDCService:
 
     DISCOVERY_PATH = URL("/.well-known/openid-configuration")
 
-    def __init__(self, issuer_url, client_id, client_secret, *,
-                 expire_after=None, introspection_endpoint=None):
-        LOGGER.info("Initializing OIDC service: "
-                    "issuer_url=%s, client_id=%s, expire_after=%d, introspection_endpoint=%s",
-                    issuer_url, client_id, expire_after, introspection_endpoint)
+    def __init__(self, issuer_url, client_id, client_secret, *, expire_after=None):
+        LOGGER.info("Initializing OIDC service: issuer_url=%s, client_id=%s, expire_after=%d",
+                    issuer_url, client_id, expire_after)
 
         self.issuer_url = issuer_url
         self.client_id = client_id
         self.client_secret = client_secret
         self.discovery_endpoint = issuer_url.join(OIDCService.DISCOVERY_PATH)
-        self.introspection_endpoint = introspection_endpoint
+        self.introspection_endpoint = None
 
         expire_after = 0 if expire_after is None else expire_after
         cache = CacheBackend(allowed_methods=(hdrs.METH_GET, hdrs.METH_POST),
@@ -32,8 +30,7 @@ class OIDCService:
         self.client_session = CachedSession(cache=cache, raise_for_status=True)
 
     async def discover(self):
-        """Perform a discovery request to populate the internal configuration for this service.
-           Running a discovery will override any attribute previously passed to the constructor."""
+        """Perform a discovery request to populate the internal configuration for this service."""
         LOGGER.info("Performing OIDC discovery: discovery_endpoint=%s", self.discovery_endpoint)
 
         async with self.client_session.get(self.discovery_endpoint) as response:

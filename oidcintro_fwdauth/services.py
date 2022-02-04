@@ -1,8 +1,8 @@
 """Services module."""
 
 import logging
+from aiohttp import hdrs, BasicAuth
 from aiohttp_client_cache import CachedSession, CacheBackend
-from aiohttp import hdrs
 from yarl import URL
 
 
@@ -19,8 +19,7 @@ class OIDCService:
                     issuer_url, client_id, expire_after)
 
         self.issuer_url = issuer_url
-        self.client_id = client_id
-        self.client_secret = client_secret
+        self.auth = BasicAuth(client_id, client_secret)
         self.discovery_endpoint = issuer_url.join(OIDCService.DISCOVERY_PATH)
         self.introspection_endpoint = None
 
@@ -48,15 +47,12 @@ class OIDCService:
         LOGGER.debug("Performing introspection: introspection_endpoint=%s, token_type_hint=%s",
                      self.introspection_endpoint, token_type_hint)
 
-        data = {
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "token": token,
-        }
+        data = {"token": token}
         if token_type_hint:
             data["token_type_hint"] = token_type_hint
 
-        async with self.client_session.post(self.introspection_endpoint, data=data) as response:
+        async with self.client_session.post(self.introspection_endpoint, auth=self.auth,
+                                            data=data) as response:
             return await response.json()
 
     async def close(self):

@@ -5,8 +5,6 @@ from aiohttp import hdrs, web
 
 async def auth_handler(request):
     """Handler for authentication requests."""
-    oidc_service = request.config_dict["oidc_service"]
-
     authorization_headers = request.headers.getall(hdrs.AUTHORIZATION, [])
     if not authorization_headers:
         raise web.HTTPUnauthorized(text="This endpoint requires client authentication")
@@ -16,6 +14,7 @@ async def auth_handler(request):
 
     token_type_hint = request.query.get("token_type_hint", None)
 
+    oidc_service = request.config_dict["oidc_service"]
     for authorization in authorization_headers:
         if " " not in authorization:
             continue

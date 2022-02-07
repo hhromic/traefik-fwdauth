@@ -1,14 +1,12 @@
 # traefik-oidcintro-fwdauth
 
 Simple OIDC introspection forward auth service for [Traefik](https://github.com/traefik/traefik/)
-(and possibly other compatible proxies).
-
-The service is implemented using the [aio-libs](https://github.com/aio-libs)
-set of asyncio-based libraries and [Python 3](https://www.python.org/downloads/).
+(and possibly other compatible proxies), written in [Python 3](https://www.python.org/downloads/)
+and [asyncio](https://docs.python.org/3/library/asyncio.html).
 
 ## Usage
 
-> **TODO**
+Usage examples can be found in the [`examples`](examples/) directory.
 
 ## Building
 

@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  dsproxy:
+    image: ghcr.io/tecnativa/docker-socket-proxy:0.1.1
+    environment:
+      LOG_LEVEL: notice
+      NETWORKS: 1
+      SERVICES: 1
+      TASKS: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
+  fwdauth:
+    image: ghcr.io/hhromic/traefik-oidcintro-fwdauth:v1.0.0
+    command: >-
+      --oidc-issuer-url https://my-oidc-provider
+      --oidc-client-id my-client-id
+      --oidc-client-secret-file /run/secrets/oidc-client-secret
+      --oidc-expire-after 60
+      --remove-server-header
+    secrets:
+      - oidc-client-secret
+    deploy:
+      endpoint_mode: dnsrr
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.enable: 'true'
+        # oidcintro-auth: any issuer client ID is accepted
+        traefik.http.middlewares.oidcintro-auth.forwardauth.address:
+          http://fwdauth:4181/auth?token_type_hint=access_token
+        traefik.http.middlewares.oidcintro-auth.forwardauth.authResponseHeaders:
+          X-Forwarded-User, X-Forwarded-Oidc-ClientId
+        # oidcintro-cl1-auth: only tokens issued by 'client1' are accepted
+        traefik.http.middlewares.oidcintro-cl1-auth.forwardauth.address:
+          http://fwdauth:4181/auth?client_ids=client1&token_type_hint=access_token
+        traefik.http.middlewares.oidcintro-cl1-auth.forwardauth.authResponseHeaders:
+          X-Forwarded-User, X-Forwarded-Oidc-ClientId
+        # oidcintro-cl12-auth: only tokens issued by 'client1' or 'client2' are accepted
+        traefik.http.middlewares.oidcintro-cl12-auth.forwardauth.address:
+          http://fwdauth:4181/auth?client_ids=client1,client2&token_type_hint=access_token
+        traefik.http.middlewares.oidcintro-cl12-auth.forwardauth.authResponseHeaders:
+          X-Forwarded-User, X-Forwarded-Oidc-ClientId
+        traefik.http.services.fwdauth.loadbalancer.server.port: 4181
+  traefik:
+    image: traefik:v2.6.0
+    environment:
+      TRAEFIK_ACCESSLOG: 'true'
+      TRAEFIK_ACCESSLOG_FILEPATH: /dev/stderr
+      TRAEFIK_ACCESSLOG_FORMAT: json
+      TRAEFIK_ACCESSLOG_FIELDS_HEADERS_NAMES_USER-AGENT: keep
+      TRAEFIK_ACCESSLOG_FIELDS_HEADERS_NAMES_X-FORWARDED-USER: keep
+      TRAEFIK_ACCESSLOG_FIELDS_HEADERS_NAMES_X-FORWARDED-OIDC-CLIENTID: keep
+      TRAEFIK_API_INSECURE: 'true'
+      TRAEFIK_ENTRYPOINTS_DEFAULT_ADDRESS: ':5555'
+      TRAEFIK_GLOBAL_CHECKNEWVERSION: 'false'
+      TRAEFIK_GLOBAL_SENDANONYMOUSUSAGE: 'false'
+      TRAEFIK_PILOT_DASHBOARD: 'false'
+      TRAEFIK_PROVIDERS_DOCKER_ENDPOINT: http://dsproxy:2375
+      TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT: 'false'
+      TRAEFIK_PROVIDERS_DOCKER_SWARMMODE: 'true'
+    ports:
+      - mode: host
+        published: 5555
+        target: 5555
+      - mode: host
+        published: 8080
+        target: 8080
+    networks:
+      - default
+      - services
+    deploy:
+      endpoint_mode: dnsrr
+      mode: global
+
+secrets:
+  oidc-client-secret:
+    external: true
+    name: oidc-client-secret
+
+networks:
+  default: {}
+  services: {}

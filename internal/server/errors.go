@@ -12,4 +12,8 @@ var (
 
 	// ErrUnsupportedAuthScheme is returned when a client request uses an unsupported authorization scheme.
 	ErrUnsupportedAuthScheme = errors.New("unsupported authorization scheme")
+	// ErrInactiveToken is returned when a client request presented an inactive token.
+	ErrInactiveToken = errors.New("inactive token")
+	// ErrInvalidClientID is returned when a client request presented an invalid client ID.
+	ErrInvalidClientID = errors.New("invalid client ID")
 )

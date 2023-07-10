@@ -62,13 +62,13 @@ func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 		}
 
 		if !ires.Active {
-			http.Error(w, "token inactive", http.StatusUnauthorized)
+			handleUnauthorized(w, ErrInactiveToken)
 			return
 		}
 
 		if len(clientIDs) > 0 && ires.ClientID != "" {
 			if _, ok := clientIDs[ires.ClientID]; !ok {
-				http.Error(w, "invalid client ID", http.StatusUnauthorized)
+				handleUnauthorized(w, ErrInvalidClientID)
 				return
 			}
 		}

@@ -13,18 +13,18 @@ import (
 )
 
 const (
-	// AuthHandlerPattern is the path pattern to use for the auth handler.
-	AuthHandlerPattern = "/auth"
-	// MetricsHandlerPattern is the path pattern to use for the metrics handler.
-	MetricsHandlerPattern = "/metrics"
+	// PatternAuthHandler is the path pattern to use for the auth handler.
+	PatternAuthHandler = "/auth"
+	// PatternMetricsHandler is the path pattern to use for the metrics handler.
+	PatternMetricsHandler = "/metrics"
 )
 
 // NewRouter creates a top-level http.Handler router for the application.
 func NewRouter(is *client.IntrospectionService) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Recoverer)
-	r.Mount(MetricsHandlerPattern, promhttp.Handler())
-	r.Mount(AuthHandlerPattern, AuthHandler(is))
+	r.Mount(PatternMetricsHandler, promhttp.Handler())
+	r.Mount(PatternAuthHandler, AuthHandler(is))
 
 	return r
 }

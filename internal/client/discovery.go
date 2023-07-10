@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	// WellKnownOpenIDConfigurationPath is the path in the issuer for performing OIDC discovery.
-	WellKnownOpenIDConfigurationPath = "/.well-known/openid-configuration"
+	// PathWellKnownOpenIDConfiguration is the path in the issuer for performing OIDC discovery.
+	PathWellKnownOpenIDConfiguration = "/.well-known/openid-configuration"
 )
 
 // OIDCDiscoveryService is an OIDC discovery service for obtaining OIDC resource metadata.
@@ -30,7 +30,7 @@ type OIDCDiscoveryResponse struct {
 
 // Discover computes the OIDC discovery URL from the configured issuer URL.
 func (s *OIDCDiscoveryService) Discover(ctx context.Context) (*OIDCDiscoveryResponse, error) {
-	discoveryURL := s.IssuerURL.JoinPath(WellKnownOpenIDConfigurationPath).String()
+	discoveryURL := s.IssuerURL.JoinPath(PathWellKnownOpenIDConfiguration).String()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, discoveryURL, nil)
 	if err != nil {

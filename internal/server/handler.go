@@ -73,7 +73,7 @@ func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 			return
 		}
 
-		if len(clientIDs) > 0 && ires.ClientID != "" {
+		if len(clientIDs) > 0 {
 			if _, ok := clientIDs[ires.ClientID]; !ok {
 				handleUnauthorized(w, ErrInvalidClientID)
 				return

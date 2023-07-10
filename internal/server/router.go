@@ -19,7 +19,7 @@ const (
 	PatternMetricsHandler = "/metrics"
 )
 
-// NewRouter creates a top-level http.Handler router for the application.
+// NewRouter creates a top-level [http.Handler] router for the application.
 func NewRouter(is *client.IntrospectionService) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Recoverer)

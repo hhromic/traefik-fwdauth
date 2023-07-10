@@ -25,8 +25,8 @@ const (
 	ResponseHeaderTimeout = 60 * time.Second
 )
 
-// NewClient creates a new http.Client that uses http.DefaultTransport with a
-// configured response header timeout.
+// NewClient creates a new [http.Client] that uses a clone of [http.DefaultTransport]
+// configured with a response header timeout.
 func NewClient() *http.Client {
 	t := http.DefaultTransport.(*http.Transport).Clone()
 	t.ResponseHeaderTimeout = ResponseHeaderTimeout

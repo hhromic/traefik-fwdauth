@@ -21,7 +21,7 @@ const (
 	QueryParamTokenTypeHint = "token_type_hint"
 )
 
-// AuthHandler is an http.Handler for authentication requests.
+// AuthHandler is an [http.Handler] for authentication requests.
 func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 	handleErr := func(w http.ResponseWriter, err error, status int) {
 		http.Error(w, err.Error(), status)

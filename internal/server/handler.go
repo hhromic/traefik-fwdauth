@@ -14,6 +14,13 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+const (
+	// QueryParamClientID is the request query parameter used for providing allowed client IDs.
+	QueryParamClientID = "client_id"
+	// QueryParamTokenTypeHint is the request query parameter used for providing a token type hint.
+	QueryParamTokenTypeHint = "token_type_hint"
+)
+
 // AuthHandler is an http.Handler for authentication requests.
 func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 	handleErr := func(w http.ResponseWriter, err error, status int) {
@@ -49,9 +56,9 @@ func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 		token := ahdr[7:]
 
 		q := r.URL.Query()
-		tokenTypeHint := q.Get("token_type_hint")
+		tokenTypeHint := q.Get(QueryParamTokenTypeHint)
 		clientIDs := make(map[string]struct{})
-		for _, cid := range q["client_id"] {
+		for _, cid := range q[QueryParamClientID] {
 			clientIDs[cid] = struct{}{}
 		}
 

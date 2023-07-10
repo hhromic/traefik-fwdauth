@@ -15,6 +15,13 @@ import (
 	"github.com/twmb/go-cache/cache"
 )
 
+const (
+	// FormFieldToken is the request form field used for providing a token.
+	FormFieldToken = "token"
+	// FormFieldTokenTypeHint is the request form field used for providing a token type hint.
+	FormFieldTokenTypeHint = "token_type_hint"
+)
+
 // IntrospectionService is an OAuth 2.0 Token Introspection (RFC 7662) service for token validation.
 type IntrospectionService struct {
 	Client       *http.Client
@@ -66,10 +73,10 @@ func (s *IntrospectionService) Introspect(ctx context.Context, token, tokenTypeH
 	introspectionURL := s.URL.String()
 
 	form := &url.Values{}
-	form.Set("token", cacheKey.Token)
+	form.Set(FormFieldToken, cacheKey.Token)
 
 	if cacheKey.TokenTypeHint != "" {
-		form.Set("token_type_hint", cacheKey.TokenTypeHint)
+		form.Set(FormFieldTokenTypeHint, cacheKey.TokenTypeHint)
 	}
 
 	body := strings.NewReader(form.Encode())

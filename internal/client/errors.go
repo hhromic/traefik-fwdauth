@@ -8,8 +8,8 @@ import "errors"
 // Errors used by the client package.
 var (
 	// ErrBadResponse is returned when a bad server response is received.
-	ErrBadResponse = errors.New("bad server response")
+	ErrBadResponse = errors.New("bad response")
 
 	// ErrDiscoveryMetadataMissing is returned when OIDC discovery metadata is missing.
-	ErrDiscoveryMetadataMissing = errors.New("missing OIDC discovery metadata")
+	ErrDiscoveryMetadataMissing = errors.New("discovery metadata missing")
 )

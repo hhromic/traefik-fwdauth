@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/url"
 	"os"
 	"os/signal"
@@ -20,7 +21,6 @@ import (
 	"github.com/hhromic/traefik-fwdauth/v2/internal/logger"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/server"
 	"go.uber.org/automaxprocs/maxprocs"
-	"golang.org/x/exp/slog"
 
 	_ "github.com/hhromic/traefik-fwdauth/v2/internal/metrics" // initialize collectors
 )

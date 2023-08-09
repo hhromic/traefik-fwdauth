@@ -5,13 +5,13 @@ package server
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/hhromic/traefik-fwdauth/v2/internal/client"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/metrics"
-	"golang.org/x/exp/slog"
 )
 
 const (

@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/url"
 	"os"
@@ -53,6 +54,13 @@ func main() {
 		panic(err)
 	}
 
+	if err := appMain(args); err != nil {
+		slog.Error("application error", "err", err)
+		os.Exit(1)
+	}
+}
+
+func appMain(args args) error {
 	if _, err := maxprocs.Set(); err != nil {
 		slog.Warn("failed to set GOMAXPROCS", "err", err)
 	}
@@ -69,8 +77,7 @@ func main() {
 	if args.ClientSecretFile != "" {
 		data, err := os.ReadFile(args.ClientSecretFile)
 		if err != nil {
-			slog.Error("error reading client secret from file", "err", err)
-			os.Exit(1)
+			return fmt.Errorf("error reading client secret from file: %w", err)
 		}
 
 		args.ClientSecret = strings.TrimRight(string(data), "\r\n")
@@ -89,8 +96,7 @@ func main() {
 
 		endpoint, err := ds.DiscoverIntrospection(ctx)
 		if err != nil {
-			slog.Error("OIDC discovery failed", "err", err)
-			os.Exit(1)
+			return fmt.Errorf("OIDC discovery failed: %w", err)
 		}
 
 		slog.Info("OIDC discovery completed", "introspection_endpoint", endpoint)
@@ -110,8 +116,10 @@ func main() {
 	slog.Info("starting HTTP server", "addr", args.ListenAddress)
 
 	if err := server.ListenAndServe(ctx, args.ListenAddress, r); err != nil && !errors.Is(err, context.Canceled) {
-		slog.Error("error running HTTP server", "err", err)
-	} else {
-		slog.Info("finished")
+		return fmt.Errorf("error running HTTP server: %w", err)
 	}
+
+	slog.Info("finished")
+
+	return nil
 }

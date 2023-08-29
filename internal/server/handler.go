@@ -23,18 +23,7 @@ const (
 
 // AuthHandler is an [http.Handler] for authentication requests.
 func AuthHandler(isrv *client.IntrospectionService) http.Handler {
-	handleErr := func(w http.ResponseWriter, err error, status int) {
-		http.Error(w, err.Error(), status)
-		slog.Error("auth handler error", "err", err, "status", status)
-		metrics.AuthRequestErrors.Add(1)
-	}
-	handleUnauthorized := func(w http.ResponseWriter, err error) {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		slog.Debug("unauthorized auth request", "err", err)
-		metrics.AuthRequestUnauthorized.Add(1)
-	}
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		s := time.Now()
 		defer func() {
 			d := time.Since(s)
@@ -42,54 +31,88 @@ func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 			metrics.AuthRequestDuration.Observe(d.Seconds())
 		}()
 
-		ahdr := r.Header.Get(HeaderAuthorization)
-		if ahdr == "" {
-			handleUnauthorized(w,
-				fmt.Errorf("%w: %q", ErrMissingRequestHeader, HeaderAuthorization),
-			)
-			return
-		}
-		if len(ahdr) <= 7 || strings.ToUpper(ahdr[0:6]) != "BEARER" {
-			handleUnauthorized(w, ErrUnsupportedAuthScheme)
-			return
-		}
-		token := ahdr[7:]
-
-		q := r.URL.Query()
-		tokenTypeHint := q.Get(QueryParamTokenTypeHint)
-		clientIDs := make(map[string]struct{})
-		for _, cid := range q[QueryParamClientID] {
-			clientIDs[cid] = struct{}{}
-		}
-
-		ires, err := isrv.Introspect(r.Context(), token, tokenTypeHint)
+		token, err := getToken(request)
 		if err != nil {
-			handleErr(w, fmt.Errorf("introspect: %w", err), http.StatusBadGateway)
+			handleUnauthorized(writer, err)
+
+			return
+		}
+
+		tth := getTokenTypeHint(request)
+
+		ires, err := isrv.Introspect(request.Context(), token, tth)
+		if err != nil {
+			handleErr(writer, fmt.Errorf("introspect: %w", err), http.StatusBadGateway)
+
 			return
 		}
 
 		if !ires.Active {
-			handleUnauthorized(w, ErrInactiveToken)
+			handleUnauthorized(writer, ErrInactiveToken)
+
 			return
 		}
 
-		if len(clientIDs) > 0 {
-			if _, ok := clientIDs[ires.ClientID]; !ok {
-				handleUnauthorized(w, ErrInvalidClientID)
-				return
-			}
+		if !checkClientID(request, ires.ClientID) {
+			handleUnauthorized(writer, ErrInvalidClientID)
+
+			return
 		}
 
 		if ires.ClientID != "" {
-			w.Header().Set(HeaderXForwardedClientID, ires.ClientID)
+			writer.Header().Set(HeaderXForwardedClientID, ires.ClientID)
 		}
 
 		if ires.Scope != "" {
-			w.Header().Set(HeaderXForwardedScope, ires.Scope)
+			writer.Header().Set(HeaderXForwardedScope, ires.Scope)
 		}
 
 		if ires.Subject != "" {
-			w.Header().Set(HeaderXForwardedSubject, ires.Subject)
+			writer.Header().Set(HeaderXForwardedSubject, ires.Subject)
 		}
 	})
+}
+
+func getToken(r *http.Request) (string, error) {
+	ahdr := r.Header.Get(HeaderAuthorization)
+	if ahdr == "" {
+		return "", fmt.Errorf("%w: %q", ErrMissingRequestHeader, HeaderAuthorization)
+	}
+
+	if len(ahdr) <= 7 || strings.ToUpper(ahdr[0:6]) != "BEARER" {
+		return "", ErrUnsupportedAuthScheme
+	}
+
+	return ahdr[7:], nil
+}
+
+func getTokenTypeHint(r *http.Request) string {
+	return r.URL.Query().Get(QueryParamTokenTypeHint)
+}
+
+func checkClientID(r *http.Request, cid string) bool {
+	cids := r.URL.Query()[QueryParamClientID]
+	if len(cids) == 0 {
+		return true
+	}
+
+	for _, val := range cids {
+		if val != "" && cid == val {
+			return true
+		}
+	}
+
+	return false
+}
+
+func handleUnauthorized(w http.ResponseWriter, err error) {
+	http.Error(w, err.Error(), http.StatusUnauthorized)
+	slog.Debug("unauthorized auth request", "err", err)
+	metrics.AuthRequestUnauthorized.Add(1)
+}
+
+func handleErr(w http.ResponseWriter, err error, status int) {
+	http.Error(w, err.Error(), status)
+	slog.Error("auth handler error", "err", err, "status", status)
+	metrics.AuthRequestErrors.Add(1)
 }

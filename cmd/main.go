@@ -20,12 +20,12 @@ import (
 	"github.com/hhromic/traefik-fwdauth/v2/internal/buildinfo"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/client"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/logger"
+	_ "github.com/hhromic/traefik-fwdauth/v2/internal/metrics" // initialize collectors
 	"github.com/hhromic/traefik-fwdauth/v2/internal/server"
 	"go.uber.org/automaxprocs/maxprocs"
-
-	_ "github.com/hhromic/traefik-fwdauth/v2/internal/metrics" // initialize collectors
 )
 
+//nolint:lll,tagalign
 type args struct {
 	ListenAddress         string         `arg:"--listen-address,env:LISTEN_ADDRESS" default:":4181" placeholder:"ADDRESS" help:"listen address for the HTTP server"`
 	OIDCIssuerURL         *url.URL       `arg:"--oidc-issuer-url,env:OIDC_ISSUER_URL" placeholder:"URL" help:"issuer URL for OIDC discovery"`
@@ -40,14 +40,14 @@ type args struct {
 
 func main() {
 	var args args
-	p := arg.MustParse(&args)
+	parser := arg.MustParse(&args)
 
 	if args.OIDCIssuerURL == nil && args.IntrospectionEndpoint == nil {
-		p.Fail("either --oidc-issuer-url or --introspection-endpoint is required")
+		parser.Fail("either --oidc-issuer-url or --introspection-endpoint is required")
 	}
 
 	if args.ClientSecret == "" && args.ClientSecretFile == "" {
-		p.Fail("either --client-secret or --client-secret-file is required")
+		parser.Fail("either --client-secret or --client-secret-file is required")
 	}
 
 	if err := logger.SlogSetDefault(os.Stderr, args.LogHandler, args.LogLevel); err != nil {
@@ -60,7 +60,7 @@ func main() {
 	}
 }
 
-func appMain(args args) error {
+func appMain(args args) error { //nolint:funlen
 	if _, err := maxprocs.Set(); err != nil {
 		slog.Warn("failed to set GOMAXPROCS", "err", err)
 	}

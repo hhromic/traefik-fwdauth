@@ -15,12 +15,15 @@ const (
 )
 
 // BuildInfo is the collector for build information of the application.
+//
+//nolint:gochecknoglobals
 var BuildInfo = promauto.NewGaugeFunc(
 	prometheus.GaugeOpts{
 		Namespace: Namespace,
 		Subsystem: "build",
 		Name:      "info",
-		Help:      "A metric with a constant '1' value labeled by version, goversion, gitcommit, gitbranch, builddate from which the application was built.",
+		Help: "A metric with a constant '1' value labeled by version, goversion, gitcommit, " +
+			"gitbranch, builddate from which the application was built.",
 		ConstLabels: prometheus.Labels{
 			"version":   buildinfo.Version,
 			"goversion": buildinfo.GoVersion,
@@ -33,31 +36,40 @@ var BuildInfo = promauto.NewGaugeFunc(
 )
 
 // AuthRequestDuration is the collector for the distribution of auth request durations.
+//
+//nolint:exhaustruct,exhaustivestruct,gochecknoglobals
 var AuthRequestDuration = promauto.NewHistogram(
 	prometheus.HistogramOpts{
-		Namespace: Namespace,
-		Subsystem: "auth",
-		Name:      "request_duration_seconds",
-		Help:      "Distribution of auth request durations in the Traefik Forward Auth service.",
+		Namespace:   Namespace,
+		Subsystem:   "auth",
+		Name:        "request_duration_seconds",
+		Help:        "Distribution of auth request durations in the Traefik Forward Auth service.",
+		ConstLabels: prometheus.Labels{},
 	},
 )
 
 // AuthRequestErrors is the collector for the total number of auth request errors.
+//
+//nolint:gochecknoglobals
 var AuthRequestErrors = promauto.NewCounter(
 	prometheus.CounterOpts{
-		Namespace: Namespace,
-		Subsystem: "auth",
-		Name:      "request_errors_total",
-		Help:      "Total number of auth request errors in the Traefik Forward Auth service.",
+		Namespace:   Namespace,
+		Subsystem:   "auth",
+		Name:        "request_errors_total",
+		Help:        "Total number of auth request errors in the Traefik Forward Auth service.",
+		ConstLabels: prometheus.Labels{},
 	},
 )
 
 // AuthRequestUnauthorized is the collector for the total number of unauthorized auth requests.
+//
+//nolint:gochecknoglobals
 var AuthRequestUnauthorized = promauto.NewCounter(
 	prometheus.CounterOpts{
-		Namespace: Namespace,
-		Subsystem: "auth",
-		Name:      "request_unauthorized_total",
-		Help:      "Total number of unauthorized auth requests in the Traefik Forward Auth service.",
+		Namespace:   Namespace,
+		Subsystem:   "auth",
+		Name:        "request_unauthorized_total",
+		Help:        "Total number of unauthorized auth requests in the Traefik Forward Auth service.",
+		ConstLabels: prometheus.Labels{},
 	},
 )

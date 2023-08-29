@@ -23,6 +23,8 @@ type OIDCDiscoveryService struct {
 }
 
 // OIDCDiscoveryResponse is a response from the OIDC discovery URL.
+//
+//nolint:tagliatelle
 type OIDCDiscoveryResponse struct {
 	// IntrospectionEndpoint is the URL for OAuth 2.0 Token Introspection (RFC 7662).
 	IntrospectionEndpoint string `json:"introspection_endpoint"`

@@ -38,6 +38,8 @@ type IntrospectionCacheKey struct {
 }
 
 // IntrospectionResponse is a response from the token introspection URL.
+//
+//nolint:tagliatelle
 type IntrospectionResponse struct {
 	Active   bool   `json:"active"`
 	ClientID string `json:"client_id"`
@@ -45,9 +47,12 @@ type IntrospectionResponse struct {
 	Subject  string `json:"sub"`
 }
 
-func NewIntrospectionCache(ctx context.Context, expireAfter time.Duration) *cache.Cache[IntrospectionCacheKey, *IntrospectionResponse] {
+func NewIntrospectionCache(
+	ctx context.Context,
+	expireAfter time.Duration,
+) *cache.Cache[IntrospectionCacheKey, *IntrospectionResponse] {
 	icache := cache.New[IntrospectionCacheKey, *IntrospectionResponse](
-		cache.AutoCleanInterval(expireAfter/2),
+		cache.AutoCleanInterval(expireAfter/2), //nolint:gomnd
 		cache.MaxAge(expireAfter),
 	)
 
@@ -60,7 +65,10 @@ func NewIntrospectionCache(ctx context.Context, expireAfter time.Duration) *cach
 }
 
 // Introspect performs token validation using token introspection.
-func (s *IntrospectionService) Introspect(ctx context.Context, token, tokenTypeHint string) (*IntrospectionResponse, error) {
+func (s *IntrospectionService) Introspect(
+	ctx context.Context,
+	token, tokenTypeHint string,
+) (*IntrospectionResponse, error) {
 	cacheKey := IntrospectionCacheKey{
 		Token:         token,
 		TokenTypeHint: tokenTypeHint,

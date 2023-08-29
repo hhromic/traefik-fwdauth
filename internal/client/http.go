@@ -28,10 +28,10 @@ const (
 // NewClient creates a new [http.Client] that uses a clone of [http.DefaultTransport]
 // configured with a response header timeout.
 func NewClient() *http.Client {
-	t := http.DefaultTransport.(*http.Transport).Clone()
+	t := http.DefaultTransport.(*http.Transport).Clone() //nolint:forcetypeassert
 	t.ResponseHeaderTimeout = ResponseHeaderTimeout
 
-	c := &http.Client{
+	c := &http.Client{ //nolint:exhaustruct,exhaustivestruct
 		Transport: t,
 	}
 

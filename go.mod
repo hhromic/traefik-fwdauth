@@ -6,6 +6,7 @@ require (
 	github.com/alexflint/go-arg v1.4.3
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/lmittmann/tint v1.0.1
+	github.com/mattn/go-isatty v0.0.19
 	github.com/prometheus/client_golang v1.16.0
 	github.com/twmb/go-cache v1.2.0
 	go.uber.org/automaxprocs v1.5.3

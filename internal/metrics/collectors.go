@@ -37,7 +37,7 @@ var BuildInfo = promauto.NewGaugeFunc(
 
 // AuthRequestDuration is the collector for the distribution of auth request durations.
 //
-//nolint:exhaustruct,exhaustivestruct,gochecknoglobals
+//nolint:exhaustruct,gochecknoglobals
 var AuthRequestDuration = promauto.NewHistogram(
 	prometheus.HistogramOpts{
 		Namespace:   Namespace,

@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/alexflint/go-arg"
-	"github.com/hhromic/go-toolkit/logger"
+	tkslog "github.com/hhromic/go-toolkit/slog"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/buildinfo"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/client"
 	_ "github.com/hhromic/traefik-fwdauth/v2/internal/metrics" // initialize collectors
@@ -34,7 +34,7 @@ type args struct {
 	ClientSecret          string         `arg:"--client-secret,env:CLIENT_SECRET" placeholder:"CLIENT_SECRET" help:"client secret for the token introspection endpoint"`
 	ClientSecretFile      string         `arg:"--client-secret-file,env:CLIENT_SECRET_FILE" placeholder:"FILE" help:"file containing the client secret"`
 	ExpireAfter           time.Duration  `arg:"--expire-after,env:EXPIRE_AFTER" default:"5m" placeholder:"DURATION" help:"time for expiring cached client requests"`
-	LogHandler            logger.Handler `arg:"--log-handler,env:LOG_HANDLER" default:"auto" placeholder:"HANDLER" help:"application logging handler"`
+	LogHandler            tkslog.Handler `arg:"--log-handler,env:LOG_HANDLER" default:"auto" placeholder:"HANDLER" help:"application logging handler"`
 	LogLevel              slog.Level     `arg:"--log-level,env:LOG_LEVEL" default:"info" placeholder:"LEVEL" help:"application logging level"`
 }
 
@@ -50,7 +50,7 @@ func main() {
 		parser.Fail("either --client-secret or --client-secret-file is required")
 	}
 
-	slog.SetDefault(logger.NewSlogLogger(os.Stderr, args.LogHandler, args.LogLevel))
+	slog.SetDefault(tkslog.NewSlogLogger(os.Stderr, args.LogHandler, args.LogLevel))
 
 	if err := appMain(args); err != nil {
 		slog.Error("application error", "err", err)

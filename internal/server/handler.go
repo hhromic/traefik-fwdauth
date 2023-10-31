@@ -108,11 +108,11 @@ func checkClientID(r *http.Request, cid string) bool {
 func handleUnauthorized(w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), http.StatusUnauthorized)
 	slog.Debug("unauthorized auth request", "err", err)
-	metrics.AuthRequestUnauthorized.Add(1)
+	metrics.AuthRequestUnauthorized.Inc()
 }
 
 func handleErr(w http.ResponseWriter, err error, status int) {
 	http.Error(w, err.Error(), status)
 	slog.Error("auth handler error", "err", err, "status", status)
-	metrics.AuthRequestErrors.Add(1)
+	metrics.AuthRequestErrors.Inc()
 }

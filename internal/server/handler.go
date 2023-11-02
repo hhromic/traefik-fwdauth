@@ -8,10 +8,8 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/hhromic/traefik-fwdauth/v2/internal/client"
-	"github.com/hhromic/traefik-fwdauth/v2/internal/metrics"
 )
 
 const (
@@ -24,13 +22,6 @@ const (
 // AuthHandler is an [http.Handler] for authentication requests.
 func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		s := time.Now()
-		defer func() {
-			d := time.Since(s)
-			slog.Debug("auth request completed", "duration", d)
-			metrics.AuthRequestDuration.Observe(d.Seconds())
-		}()
-
 		token, err := getToken(request)
 		if err != nil {
 			handleUnauthorized(writer, err)
@@ -108,11 +99,9 @@ func checkClientID(r *http.Request, cid string) bool {
 func handleUnauthorized(w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), http.StatusUnauthorized)
 	slog.Debug("unauthorized auth request", "err", err)
-	metrics.AuthRequestUnauthorized.Inc()
 }
 
 func handleErr(w http.ResponseWriter, err error, status int) {
 	http.Error(w, err.Error(), status)
 	slog.Error("auth handler error", "err", err, "status", status)
-	metrics.AuthRequestErrors.Inc()
 }

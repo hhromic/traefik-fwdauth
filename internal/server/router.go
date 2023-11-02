@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/client"
+	"github.com/hhromic/traefik-fwdauth/v2/internal/metrics"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -20,11 +21,22 @@ const (
 )
 
 // NewRouter creates a top-level [http.Handler] router for the application.
-func NewRouter(is *client.IntrospectionService) http.Handler {
+func NewRouter(isrv *client.IntrospectionService) http.Handler {
+	ahandler := promhttp.InstrumentHandlerInFlight(
+		metrics.AuthInFlightRequests,
+		promhttp.InstrumentHandlerDuration(
+			metrics.AuthRequestDuration,
+			promhttp.InstrumentHandlerCounter(
+				metrics.AuthRequestsTotal,
+				AuthHandler(isrv),
+			),
+		),
+	)
+
 	r := chi.NewRouter()
 	r.Use(middleware.Recoverer)
 	r.Mount(PatternMetricsHandler, promhttp.Handler())
-	r.Mount(PatternAuthHandler, AuthHandler(is))
+	r.Mount(PatternAuthHandler, ahandler)
 
 	return r
 }

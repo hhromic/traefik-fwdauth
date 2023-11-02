@@ -35,10 +35,37 @@ var BuildInfo = promauto.NewGaugeFunc(
 	func() float64 { return 1 },
 )
 
+// AuthInFlightRequests is the collector for the number of auth requests currently being served.
+//
+//nolint:gochecknoglobals
+var AuthInFlightRequests = promauto.NewGauge(
+	prometheus.GaugeOpts{
+		Namespace:   Namespace,
+		Subsystem:   "auth",
+		Name:        "in_flight_requests",
+		Help:        "Number of auth requests currently being served in the Traefik Forward Auth service.",
+		ConstLabels: prometheus.Labels{},
+	},
+)
+
+// AuthRequestsTotal is the collector for the total number of auth requests.
+//
+//nolint:gochecknoglobals
+var AuthRequestsTotal = promauto.NewCounterVec(
+	prometheus.CounterOpts{
+		Namespace:   Namespace,
+		Subsystem:   "auth",
+		Name:        "requests_total",
+		Help:        "Total number of auth requests in the Traefik Forward Auth service.",
+		ConstLabels: prometheus.Labels{},
+	},
+	[]string{"code"},
+)
+
 // AuthRequestDuration is the collector for the distribution of auth request durations.
 //
 //nolint:exhaustruct,gochecknoglobals
-var AuthRequestDuration = promauto.NewHistogram(
+var AuthRequestDuration = promauto.NewHistogramVec(
 	prometheus.HistogramOpts{
 		Namespace:   Namespace,
 		Subsystem:   "auth",
@@ -46,30 +73,5 @@ var AuthRequestDuration = promauto.NewHistogram(
 		Help:        "Distribution of auth request durations in the Traefik Forward Auth service.",
 		ConstLabels: prometheus.Labels{},
 	},
-)
-
-// AuthRequestErrors is the collector for the total number of auth request errors.
-//
-//nolint:gochecknoglobals
-var AuthRequestErrors = promauto.NewCounter(
-	prometheus.CounterOpts{
-		Namespace:   Namespace,
-		Subsystem:   "auth",
-		Name:        "request_errors_total",
-		Help:        "Total number of auth request errors in the Traefik Forward Auth service.",
-		ConstLabels: prometheus.Labels{},
-	},
-)
-
-// AuthRequestUnauthorized is the collector for the total number of unauthorized auth requests.
-//
-//nolint:gochecknoglobals
-var AuthRequestUnauthorized = promauto.NewCounter(
-	prometheus.CounterOpts{
-		Namespace:   Namespace,
-		Subsystem:   "auth",
-		Name:        "request_unauthorized_total",
-		Help:        "Total number of unauthorized auth requests in the Traefik Forward Auth service.",
-		ConstLabels: prometheus.Labels{},
-	},
+	[]string{"code"},
 )

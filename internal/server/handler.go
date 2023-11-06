@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"strings"
 
 	"github.com/hhromic/traefik-fwdauth/v2/internal/client"
 )
@@ -22,16 +21,12 @@ const (
 // AuthHandler is an [http.Handler] for authentication requests.
 func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		token, err := getToken(request)
-		if err != nil {
-			handleUnauthorized(writer, err)
+		ctx := request.Context()
 
-			return
-		}
+		token := TokenFromContext(ctx)
+		tth := request.URL.Query().Get(QueryParamTokenTypeHint)
 
-		tth := getTokenTypeHint(request)
-
-		ires, err := isrv.Introspect(request.Context(), token, tth)
+		ires, err := isrv.Introspect(ctx, token, tth)
 		if err != nil {
 			handleErr(writer, fmt.Errorf("introspect: %w", err), http.StatusBadGateway)
 
@@ -62,23 +57,6 @@ func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 			writer.Header().Set(HeaderXForwardedSubject, ires.Subject)
 		}
 	})
-}
-
-func getToken(r *http.Request) (string, error) {
-	ahdr := r.Header.Get(HeaderAuthorization)
-	if ahdr == "" {
-		return "", fmt.Errorf("%w: %q", ErrMissingRequestHeader, HeaderAuthorization)
-	}
-
-	if len(ahdr) <= 7 || strings.ToUpper(ahdr[0:6]) != "BEARER" {
-		return "", ErrUnsupportedAuthScheme
-	}
-
-	return ahdr[7:], nil
-}
-
-func getTokenTypeHint(r *http.Request) string {
-	return r.URL.Query().Get(QueryParamTokenTypeHint)
 }
 
 func checkClientID(r *http.Request, cid string) bool {

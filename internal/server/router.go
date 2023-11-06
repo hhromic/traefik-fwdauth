@@ -28,7 +28,7 @@ func NewRouter(isrv *client.IntrospectionService) http.Handler {
 			metrics.AuthRequestDuration,
 			promhttp.InstrumentHandlerCounter(
 				metrics.AuthRequestsTotal,
-				AuthHandler(isrv),
+				ExtractToken(AuthHandler(isrv)),
 			),
 		),
 	)

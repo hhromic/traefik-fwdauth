@@ -71,6 +71,7 @@ var AuthRequestDuration = promauto.NewHistogramVec(
 		Subsystem:   "auth",
 		Name:        "request_duration_seconds",
 		Help:        "Distribution of auth request durations in the Traefik Forward Auth service.",
+		Buckets:     []float64{.1, .2, .4, 1, 3, 8, 20, 60, 120},
 		ConstLabels: prometheus.Labels{},
 	},
 	[]string{"code"},

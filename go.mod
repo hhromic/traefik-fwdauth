@@ -1,8 +1,6 @@
 module github.com/hhromic/traefik-fwdauth/v2
 
-go 1.21
-
-toolchain go1.21.3
+go 1.21.0
 
 require (
 	github.com/alexflint/go-arg v1.4.3

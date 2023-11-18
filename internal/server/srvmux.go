@@ -6,8 +6,6 @@ package server
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/client"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/metrics"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -20,8 +18,8 @@ const (
 	PatternMetricsHandler = "/metrics"
 )
 
-// NewRouter creates a top-level [http.Handler] router for the application.
-func NewRouter(isrv *client.IntrospectionService) http.Handler {
+// NewServeMux creates a top-level request multiplexer for the application.
+func NewServeMux(isrv *client.IntrospectionService) *http.ServeMux {
 	ahandler := promhttp.InstrumentHandlerInFlight(
 		metrics.AuthInFlightRequests,
 		promhttp.InstrumentHandlerDuration(
@@ -33,10 +31,9 @@ func NewRouter(isrv *client.IntrospectionService) http.Handler {
 		),
 	)
 
-	r := chi.NewRouter()
-	r.Use(middleware.Recoverer)
-	r.Mount(PatternMetricsHandler, promhttp.Handler())
-	r.Mount(PatternAuthHandler, ahandler)
+	m := http.NewServeMux()
+	m.Handle(PatternMetricsHandler, promhttp.Handler())
+	m.Handle(PatternAuthHandler, ahandler)
 
-	return r
+	return m
 }

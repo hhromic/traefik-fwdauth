@@ -16,7 +16,7 @@ services:
         constraints:
           - node.role == manager
   fwdauth:
-    image: ghcr.io/hhromic/traefik-fwdauth:v2.1.0
+    image: ghcr.io/hhromic/traefik-fwdauth:v2.3.0
     environment:
       OIDC_ISSUER_URL: https://my-oidc-provider
       CLIENT_ID: my-client-id
@@ -47,7 +47,7 @@ services:
           X-Forwarded-Client-Id, X-Forwarded-Scope, X-Forwarded-Subject
         traefik.http.services.fwdauth.loadbalancer.server.port: 4181
   traefik:
-    image: traefik:v2.10.3
+    image: traefik:v2.10.5
     environment:
       TRAEFIK_ACCESSLOG: 'true'
       TRAEFIK_ACCESSLOG_FILEPATH: /dev/stderr

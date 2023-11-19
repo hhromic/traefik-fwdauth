@@ -6,6 +6,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -41,4 +42,18 @@ func Run(ctx context.Context, addr string, handler http.Handler) error {
 	}
 
 	return nil
+}
+
+// Error replies to the request with the specified error message and HTTP code.
+// It also logs the request remote address, error and code as a warning. The only
+// exception are [http.StatusUnauthorized] codes, which are logged at the debug level.
+func Error(writer http.ResponseWriter, request *http.Request, err string, code int) {
+	http.Error(writer, err, code)
+
+	logFn := slog.Warn
+	if code == http.StatusUnauthorized {
+		logFn = slog.Debug
+	}
+
+	logFn("request error", "addr", request.RemoteAddr, "err", err, "code", code)
 }

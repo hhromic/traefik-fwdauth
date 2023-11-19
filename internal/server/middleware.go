@@ -24,7 +24,7 @@ func ExtractToken(next http.Handler) http.Handler {
 
 		token, err := getToken(request)
 		if err != nil {
-			http.Error(writer, err.Error(), http.StatusUnauthorized)
+			Error(writer, request, err.Error(), http.StatusUnauthorized)
 
 			return
 		}
@@ -51,7 +51,7 @@ func getToken(r *http.Request) (string, error) {
 	}
 
 	if len(ahdr) <= 7 || strings.ToUpper(ahdr[0:6]) != "BEARER" {
-		return "", ErrUnsupportedAuthScheme
+		return "", fmt.Errorf("%w: %q", ErrUnsupportedAuthSyntax, ahdr)
 	}
 
 	return ahdr[7:], nil

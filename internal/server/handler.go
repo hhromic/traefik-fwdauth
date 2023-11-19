@@ -4,8 +4,6 @@
 package server
 
 import (
-	"fmt"
-	"log/slog"
 	"net/http"
 
 	"github.com/hhromic/traefik-fwdauth/v2/internal/client"
@@ -28,19 +26,19 @@ func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 
 		ires, err := isrv.Introspect(ctx, token, tth)
 		if err != nil {
-			handleErr(writer, fmt.Errorf("introspect: %w", err), http.StatusBadGateway)
+			Error(writer, request, "introspect: "+err.Error(), http.StatusBadGateway)
 
 			return
 		}
 
 		if !ires.Active {
-			handleUnauthorized(writer, ErrInactiveToken)
+			Error(writer, request, "inactive token", http.StatusUnauthorized)
 
 			return
 		}
 
 		if !checkClientID(request, ires.ClientID) {
-			handleUnauthorized(writer, ErrInvalidClientID)
+			Error(writer, request, "invalid client ID", http.StatusUnauthorized)
 
 			return
 		}
@@ -72,14 +70,4 @@ func checkClientID(r *http.Request, cid string) bool {
 	}
 
 	return false
-}
-
-func handleUnauthorized(w http.ResponseWriter, err error) {
-	http.Error(w, err.Error(), http.StatusUnauthorized)
-	slog.Debug("unauthorized auth request", "err", err)
-}
-
-func handleErr(w http.ResponseWriter, err error, status int) {
-	http.Error(w, err.Error(), status)
-	slog.Error("auth handler error", "err", err, "status", status)
 }

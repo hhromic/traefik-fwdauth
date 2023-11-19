@@ -9,11 +9,6 @@ import "errors"
 var (
 	// ErrRequestHeaderMissing is returned when a client request is missing a header.
 	ErrMissingRequestHeader = errors.New("missing request header")
-
-	// ErrUnsupportedAuthScheme is returned when a client request uses an unsupported authorization scheme.
-	ErrUnsupportedAuthScheme = errors.New("unsupported authorization scheme")
-	// ErrInactiveToken is returned when a client request presented an inactive token.
-	ErrInactiveToken = errors.New("inactive token")
-	// ErrInvalidClientID is returned when a client request presented an invalid client ID.
-	ErrInvalidClientID = errors.New("invalid client ID")
+	// ErrUnsupportedAuthSyntax is returned when a client request uses an unsupported authorization syntax.
+	ErrUnsupportedAuthSyntax = errors.New("unsupported authorization syntax")
 )

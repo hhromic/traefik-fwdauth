@@ -45,13 +45,14 @@ func Run(ctx context.Context, addr string, handler http.Handler) error {
 }
 
 // Error replies to the request with the specified error message and HTTP code.
-// It also logs the request remote address, error and code as a warning. The only
-// exception are [http.StatusUnauthorized] codes, which are logged at the debug level.
+// It also logs the request remote address, error and code as a warning.
+// For the case of [http.StatusUnauthorized] and [http.StatusForbidden] codes,
+// the logs are emitted at the debug level.
 func Error(writer http.ResponseWriter, request *http.Request, err string, code int) {
 	http.Error(writer, err, code)
 
 	logFn := slog.Warn
-	if code == http.StatusUnauthorized {
+	if code == http.StatusUnauthorized || code == http.StatusForbidden {
 		logFn = slog.Debug
 	}
 

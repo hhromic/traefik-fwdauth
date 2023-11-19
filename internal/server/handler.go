@@ -37,8 +37,8 @@ func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 			return
 		}
 
-		if !checkClientID(request, ires.ClientID) {
-			Error(writer, request, "invalid client ID", http.StatusUnauthorized)
+		if !isValidClientID(request, ires.ClientID) {
+			Error(writer, request, "invalid client ID", http.StatusForbidden)
 
 			return
 		}
@@ -57,7 +57,7 @@ func AuthHandler(isrv *client.IntrospectionService) http.Handler {
 	})
 }
 
-func checkClientID(r *http.Request, cid string) bool {
+func isValidClientID(r *http.Request, cid string) bool {
 	cids := r.URL.Query()[QueryParamClientID]
 	if len(cids) == 0 {
 		return true

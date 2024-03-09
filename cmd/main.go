@@ -38,6 +38,13 @@ type args struct {
 	LogLevel              slog.Level     `arg:"--log-level,env:LOG_LEVEL" default:"info" placeholder:"LEVEL" help:"application logging level"`
 }
 
+func (args) Description() string {
+	return fmt.Sprintf(
+		"Traefik forward auth service - version %s (%s/%s)",
+		buildinfo.Version, buildinfo.GitBranch, buildinfo.GitCommit,
+	)
+}
+
 func main() {
 	var args args
 	parser := arg.MustParse(&args)

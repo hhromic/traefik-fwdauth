@@ -52,7 +52,7 @@ func NewIntrospectionCache(
 	expireAfter time.Duration,
 ) *cache.Cache[IntrospectionCacheKey, *IntrospectionResponse] {
 	icache := cache.New[IntrospectionCacheKey, *IntrospectionResponse](
-		cache.AutoCleanInterval(expireAfter/2), //nolint:gomnd
+		cache.AutoCleanInterval(expireAfter/2), //nolint:mnd
 		cache.MaxAge(expireAfter),
 	)
 

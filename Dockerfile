@@ -18,7 +18,7 @@ COPY . .
 ARG GORELEASER_EXTRA_ARGS
 RUN GOTOOLCHAIN=local \
     CGO_ENABLED=0 \
-    goreleaser build --clean --single-target --output traefik-fwdauth ${GORELEASER_EXTRA_ARGS}
+    goreleaser build --clean --single-target ${GORELEASER_EXTRA_ARGS}
 
 # Start a new stage for the final application image
 FROM cgr.dev/chainguard/static:latest AS final
@@ -33,4 +33,4 @@ ENTRYPOINT ["/traefik-fwdauth"]
 EXPOSE 9878
 
 # Copy application binary
-COPY --from=builder /build/traefik-fwdauth /traefik-fwdauth
+COPY --from=builder /build/dist/traefik-fwdauth /traefik-fwdauth

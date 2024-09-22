@@ -26,7 +26,7 @@ docker buildx build -t ghcr.io/hhromic/traefik-fwdauth:vX.Y.Z .
 
 To build a snapshot locally Using [GoReleaser](https://goreleaser.com/):
 ```
-goreleaser build --clean --single-target --output traefik-fwdauth --snapshot
+goreleaser build --clean --single-target --snapshot
 ```
 
 ## License

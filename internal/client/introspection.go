@@ -47,6 +47,7 @@ type IntrospectionResponse struct {
 	Subject  string `json:"sub"`
 }
 
+// NewIntrospectionCache creates a new cache to be used in an [IntrospectionService] instance.
 func NewIntrospectionCache(
 	ctx context.Context,
 	expireAfter time.Duration,
@@ -102,7 +103,7 @@ func (s *IntrospectionService) Introspect(
 	if err != nil {
 		return nil, fmt.Errorf("client request: %w", err)
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("%w: %q", ErrBadResponse, res.Status)

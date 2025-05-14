@@ -45,7 +45,7 @@ func (s *OIDCDiscoveryService) Discover(ctx context.Context) (*OIDCDiscoveryResp
 	if err != nil {
 		return nil, fmt.Errorf("client request: %w", err)
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("%w: %q", ErrBadResponse, res.Status)
@@ -59,7 +59,7 @@ func (s *OIDCDiscoveryService) Discover(ctx context.Context) (*OIDCDiscoveryResp
 	return &odr, nil
 }
 
-// OIDCDiscoverIntrospection discovers an introspection URL using OIDC discovery.
+// DiscoverIntrospection discovers an introspection URL using OIDC discovery.
 func (s *OIDCDiscoveryService) DiscoverIntrospection(ctx context.Context) (*url.URL, error) {
 	odr, err := s.Discover(ctx)
 	if err != nil {

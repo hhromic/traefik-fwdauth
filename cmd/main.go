@@ -118,7 +118,8 @@ func appMain(args args) error { //nolint:funlen
 
 	slog.Info("starting HTTP server", "addr", args.ListenAddress)
 
-	if err := server.Run(ctx, args.ListenAddress, m); err != nil && !errors.Is(err, context.Canceled) {
+	err := server.Run(ctx, args.ListenAddress, m)
+	if err != nil && !errors.Is(err, context.Canceled) {
 		return fmt.Errorf("run: %w", err)
 	}
 

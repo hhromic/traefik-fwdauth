@@ -22,7 +22,6 @@ import (
 	"github.com/hhromic/traefik-fwdauth/v2/internal/client"
 	_ "github.com/hhromic/traefik-fwdauth/v2/internal/metrics" // initialize collectors
 	"github.com/hhromic/traefik-fwdauth/v2/internal/server"
-	"go.uber.org/automaxprocs/maxprocs"
 )
 
 //nolint:lll,tagalign
@@ -63,11 +62,7 @@ func main() {
 	}
 }
 
-func appMain(args args) error { //nolint:funlen
-	if _, err := maxprocs.Set(); err != nil {
-		slog.Warn("failed to set GOMAXPROCS", "err", err)
-	}
-
+func appMain(args args) error {
 	slog.Info("starting",
 		"version", buildinfo.Version,
 		"goversion", buildinfo.GoVersion,

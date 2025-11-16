@@ -47,6 +47,7 @@ func (args) Version() string {
 
 func main() {
 	var args args
+
 	parser := arg.MustParse(&args)
 
 	if args.OIDCIssuerURL == nil && args.IntrospectionEndpoint == nil {

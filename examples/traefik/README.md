@@ -1,11 +1,12 @@
 # Traefik Example
 
-> **Note:** The example in this directory assumes that you have Docker running
+> [!NOTE]
+> The example in this directory assumes that you have Docker running
 > in [swarm mode](https://docs.docker.com/engine/swarm/).
 
-To run the example, first edit the Traefik stack in `stacks/traefik.yaml` to customise the OIDC
+To run the example, first edit the Traefik stack in `stacks/traefik.yaml` to customize the OIDC
 Issuer URL and Client ID for your environment. Also edit the secret in `secrets/client-secret` to
-customise the corresponding Client Secret.
+customize the corresponding Client Secret.
 
 Then, deploy the Traefik stack:
 ```
@@ -13,7 +14,7 @@ docker secret create client-secret secrets/client-secret
 docker stack deploy -c stacks/traefik.yaml traefik
 ```
 
-The above will initialise a Traefik instance running on ports `5555` (default entrypoint for serving
+The above will initialize a Traefik instance running on ports `5555` (default entrypoint for serving
 HTTP requests) and `8080` (the Traefik dashboard).
 
 In addition, this stack also creates two overlay networks: `traefik_default`, for the `dsproxy`,
@@ -43,7 +44,8 @@ This stack will deploy six [whoami](https://github.com/traefik/whoami) container
 After deploying, and after a short time, the configured Docker Swarm autodiscovery in Traefik will
 find the deployed service containers and autoconfigure routing/middlewares using the labels.
 
-> **Note:** The Docker Swarm autodiscovery defaults to refreshing data every `15s`.
+> [!NOTE]
+> The Docker Swarm autodiscovery defaults to refreshing data every `15s`.
 
 If you navigate to the [HTTP Services](http://localhost:8080/dashboard/#/http/services) status page,
 you should now be able to find three new application services: `whoami@docker`, `whoami-cl1@docker`
@@ -60,7 +62,8 @@ $ curl -H "Authorization: Bearer YOUR-TOKEN" http://localhost:5555/whoami-cl1
 $ curl -H "Authorization: Bearer YOUR-TOKEN" http://localhost:5555/whoami-cl12
 ```
 
-> **Note:** In this example, the Traefik access logs (available on stderr) will contain the
+> [!NOTE]
+> In this example, the Traefik access logs (available on stderr) will contain the
 > authenticated subject and issuing Client ID via logging of the `X-Forwarded-Subject` and
 > `X-Forwarded-Client-Id` HTTP headers. In addition, any token scopes will be in `X-Forwarded-Scope`.
 

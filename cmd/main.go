@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/alexflint/go-arg"
-	tkslog "github.com/hhromic/go-toolkit/slog"
+	"github.com/hhromic/go-toolkit/slogkit"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/buildinfo"
 	"github.com/hhromic/traefik-fwdauth/v2/internal/client"
 	_ "github.com/hhromic/traefik-fwdauth/v2/internal/metrics" // initialize collectors
@@ -26,15 +26,15 @@ import (
 
 //nolint:lll,tagalign
 type args struct {
-	ListenAddress         string         `arg:"--listen-address,env:LISTEN_ADDRESS" default:":4181" placeholder:"ADDRESS" help:"listen address for the HTTP server"`
-	OIDCIssuerURL         *url.URL       `arg:"--oidc-issuer-url,env:OIDC_ISSUER_URL" placeholder:"URL" help:"issuer URL for OIDC discovery"`
-	IntrospectionEndpoint *url.URL       `arg:"--introspection-endpoint,env:INTROSPECTION_ENDPOINT" placeholder:"URL" help:"token introspection endpoint"`
-	ClientID              string         `arg:"--client-id,required,env:CLIENT_ID" placeholder:"CLIENT_ID" help:"client ID for the token introspection endpoint"`
-	ClientSecret          string         `arg:"--client-secret,env:CLIENT_SECRET" placeholder:"CLIENT_SECRET" help:"client secret for the token introspection endpoint"`
-	ClientSecretFile      string         `arg:"--client-secret-file,env:CLIENT_SECRET_FILE" placeholder:"FILE" help:"file containing the client secret"`
-	ExpireAfter           time.Duration  `arg:"--expire-after,env:EXPIRE_AFTER" default:"5m" placeholder:"DURATION" help:"time for expiring cached client requests"`
-	LogHandler            tkslog.Handler `arg:"--log-handler,env:LOG_HANDLER" default:"auto" placeholder:"HANDLER" help:"application logging handler"`
-	LogLevel              slog.Level     `arg:"--log-level,env:LOG_LEVEL" default:"info" placeholder:"LEVEL" help:"application logging level"`
+	ListenAddress         string          `arg:"--listen-address,env:LISTEN_ADDRESS" default:":4181" placeholder:"ADDRESS" help:"listen address for the HTTP server"`
+	OIDCIssuerURL         *url.URL        `arg:"--oidc-issuer-url,env:OIDC_ISSUER_URL" placeholder:"URL" help:"issuer URL for OIDC discovery"`
+	IntrospectionEndpoint *url.URL        `arg:"--introspection-endpoint,env:INTROSPECTION_ENDPOINT" placeholder:"URL" help:"token introspection endpoint"`
+	ClientID              string          `arg:"--client-id,required,env:CLIENT_ID" placeholder:"CLIENT_ID" help:"client ID for the token introspection endpoint"`
+	ClientSecret          string          `arg:"--client-secret,env:CLIENT_SECRET" placeholder:"CLIENT_SECRET" help:"client secret for the token introspection endpoint"`
+	ClientSecretFile      string          `arg:"--client-secret-file,env:CLIENT_SECRET_FILE" placeholder:"FILE" help:"file containing the client secret"`
+	ExpireAfter           time.Duration   `arg:"--expire-after,env:EXPIRE_AFTER" default:"5m" placeholder:"DURATION" help:"time for expiring cached client requests"`
+	LogHandler            slogkit.Handler `arg:"--log-handler,env:LOG_HANDLER" default:"auto" placeholder:"HANDLER" help:"application logging handler"`
+	LogLevel              slog.Level      `arg:"--log-level,env:LOG_LEVEL" default:"info" placeholder:"LEVEL" help:"application logging level"`
 }
 
 func (args) Description() string {
@@ -58,7 +58,7 @@ func main() {
 		parser.Fail("either --client-secret or --client-secret-file is required")
 	}
 
-	slog.SetDefault(tkslog.NewSlogLogger(os.Stderr, args.LogHandler, args.LogLevel))
+	slog.SetDefault(slogkit.NewLogger(os.Stderr, args.LogHandler, args.LogLevel))
 
 	if err := appMain(args); err != nil {
 		slog.Error("application error", "err", err)

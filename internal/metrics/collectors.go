@@ -64,7 +64,7 @@ var AuthRequestsTotal = promauto.NewCounterVec(
 
 // AuthRequestDuration is the collector for the distribution of auth request durations.
 //
-//nolint:exhaustruct,gochecknoglobals
+//nolint:exhaustruct_v5,gochecknoglobals
 var AuthRequestDuration = promauto.NewHistogramVec(
 	prometheus.HistogramOpts{
 		Namespace:   Namespace,

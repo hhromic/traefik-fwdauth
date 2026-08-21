@@ -31,7 +31,7 @@ func NewClient() *http.Client {
 	t := http.DefaultTransport.(*http.Transport).Clone() //nolint:forcetypeassert
 	t.ResponseHeaderTimeout = ResponseHeaderTimeout
 
-	c := &http.Client{ //nolint:exhaustruct
+	c := &http.Client{ //nolint:exhaustruct_v5
 		Transport: t,
 	}
 

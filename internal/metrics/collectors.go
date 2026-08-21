@@ -16,7 +16,7 @@ const (
 
 // BuildInfo is the collector for build information of the application.
 //
-//nolint:gochecknoglobals
+//nolint:exhaustruct_v5,gochecknoglobals
 var BuildInfo = promauto.NewGaugeFunc(
 	prometheus.GaugeOpts{
 		Namespace: Namespace,
@@ -37,7 +37,7 @@ var BuildInfo = promauto.NewGaugeFunc(
 
 // AuthInFlightRequests is the collector for the number of auth requests currently being served.
 //
-//nolint:gochecknoglobals
+//nolint:exhaustruct_v5,gochecknoglobals
 var AuthInFlightRequests = promauto.NewGauge(
 	prometheus.GaugeOpts{
 		Namespace:   Namespace,
@@ -50,7 +50,7 @@ var AuthInFlightRequests = promauto.NewGauge(
 
 // AuthRequestsTotal is the collector for the total number of auth requests.
 //
-//nolint:gochecknoglobals
+//nolint:exhaustruct_v5,gochecknoglobals
 var AuthRequestsTotal = promauto.NewCounterVec(
 	prometheus.CounterOpts{
 		Namespace:   Namespace,

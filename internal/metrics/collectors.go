@@ -14,13 +14,22 @@ const (
 	Namespace = "fwdauth"
 )
 
+const (
+	subsystemAuth  = "auth"
+	subsystemBuild = "build"
+)
+
+const (
+	labelCode = "code"
+)
+
 // BuildInfo is the collector for build information of the application.
 //
 //nolint:exhaustruct_v5,gochecknoglobals
 var BuildInfo = promauto.NewGaugeFunc(
 	prometheus.GaugeOpts{
 		Namespace: Namespace,
-		Subsystem: "build",
+		Subsystem: subsystemBuild,
 		Name:      "info",
 		Help: "A metric with a constant '1' value labeled by version, goversion, gitcommit, " +
 			"gitbranch, builddate from which the application was built.",
@@ -41,7 +50,7 @@ var BuildInfo = promauto.NewGaugeFunc(
 var AuthInFlightRequests = promauto.NewGauge(
 	prometheus.GaugeOpts{
 		Namespace:   Namespace,
-		Subsystem:   "auth",
+		Subsystem:   subsystemAuth,
 		Name:        "in_flight_requests",
 		Help:        "Number of auth requests currently being served in the Traefik Forward Auth service.",
 		ConstLabels: prometheus.Labels{},
@@ -54,12 +63,12 @@ var AuthInFlightRequests = promauto.NewGauge(
 var AuthRequestsTotal = promauto.NewCounterVec(
 	prometheus.CounterOpts{
 		Namespace:   Namespace,
-		Subsystem:   "auth",
+		Subsystem:   subsystemAuth,
 		Name:        "requests_total",
 		Help:        "Total number of auth requests in the Traefik Forward Auth service.",
 		ConstLabels: prometheus.Labels{},
 	},
-	[]string{"code"},
+	[]string{labelCode},
 )
 
 // AuthRequestDuration is the collector for the distribution of auth request durations.
@@ -68,11 +77,11 @@ var AuthRequestsTotal = promauto.NewCounterVec(
 var AuthRequestDuration = promauto.NewHistogramVec(
 	prometheus.HistogramOpts{
 		Namespace:   Namespace,
-		Subsystem:   "auth",
+		Subsystem:   subsystemAuth,
 		Name:        "request_duration_seconds",
 		Help:        "Distribution of auth request durations in the Traefik Forward Auth service.",
 		Buckets:     []float64{.1, .2, .4, 1, 3, 8, 20, 60, 120},
 		ConstLabels: prometheus.Labels{},
 	},
-	[]string{"code"},
+	[]string{labelCode},
 )

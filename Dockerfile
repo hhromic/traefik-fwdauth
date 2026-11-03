@@ -22,11 +22,6 @@ RUN CGO_ENABLED=0 \
 # Start a new stage for the final application image
 FROM cgr.dev/chainguard/static:latest AS final
 
-# Configure image labels
-LABEL org.opencontainers.image.source=https://github.com/hhromic/traefik-fwdauth \
-      org.opencontainers.image.description="Simple Forward Auth service for Traefik (and possibly other compatible proxies), written in Go." \
-      org.opencontainers.image.licenses=Apache-2.0
-
 # Configure default entrypoint and exposed port of the application
 ENTRYPOINT ["/traefik-fwdauth"]
 EXPOSE 9878

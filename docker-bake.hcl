@@ -12,6 +12,7 @@ variable "_metadata" {
     "org.opencontainers.image.authors" = "https://github.com/hhromic"
     "org.opencontainers.image.created" = IMAGE_CREATED
     "org.opencontainers.image.description" = "Simple Forward Auth service for Traefik (and possibly other compatible proxies), written in Go."
+    "org.opencontainers.image.documentation" = "https://github.com/hhromic/traefik-fwdauth"
     "org.opencontainers.image.licenses" = "Apache-2.0"
     "org.opencontainers.image.source" = "https://github.com/hhromic/traefik-fwdauth"
     "org.opencontainers.image.title" = "Traefik Forward Auth Service"
@@ -26,8 +27,8 @@ target "default" {
   annotations = [for k, v in _metadata: "${k}=${v}"]
   labels = _metadata
   attest = [
-    {"type" = "sbom", "disabled" = true},
     {"type" = "provenance", "disabled" = true},
+    {"type" = "sbom", "disabled" = true},
   ]
 }
 
